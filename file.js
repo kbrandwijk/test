@@ -1,13 +1,15 @@
-var Webtask    = require('webtask-tools');
-var express    = require('express');
-var crypto     = require('crypto');
-var multiparty = require('multiparty');
-var formData   = require("form-data");
-var request    = require("request");
+"use latest"
 
-var app = express();
+import Webtask from 'webtask-tools';
+import express from 'express';
+import crypto from 'crypto';
+import multiparty from 'multiparty';
+import formData from 'form-data';
+import request from 'request';
 
-app.post('/:projectid', function (req, res) {
+let app = express();
+
+app.post('/:projectid', (req, res) => {
   const cipher = crypto.createCipher('aes256', req.webtaskContext.secrets.FILE_ENC_CYPHER);
 
   var form = new multiparty.Form();
@@ -52,7 +54,7 @@ app.post('/:projectid', function (req, res) {
   form.parse(req);
 });
 
-app.get('/:projectid/:fileid', function (req, res) {
+app.get('/:projectid/:fileid', (req, res) => {
 
   const decipher = crypto.createDecipher('aes256', req.webtaskContext.secrets.FILE_ENC_CYPHER);
 
@@ -66,4 +68,4 @@ app.get('/:projectid/:fileid', function (req, res) {
   resource.pipe(decipher).pipe(res);
 });
 
-module.exports = Webtask.fromExpress(app);
+export default Webtask.fromExpress(app);
