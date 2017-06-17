@@ -9,22 +9,22 @@ var app = express();
 
 app.post('/:projectid', function (req, res) {
   const cipher = crypto.createCipher('aes256', req.webtaskContext.secrets.FILE_ENC_CYPHER);
-  
+
   var form = new multiparty.Form();
-  
+
   form.on('part', function(part) {
-    
+
     var formdata = new formData();
 
-    formdata.append("data", part.pipe(cipher), {filename: part.filename, contentType: part["content-type"]});
+    formdata.append("data", part.pipe(cipher), { filename: part.filename, contentType: part["content-type"] });
 
     var r = request.post(`https://api.graph.cool/file/v1/${req.params.projectid}`, { "headers": {"transfer-encoding": "chunked"} }, function(err,resp,body) {
       var result = JSON.parse(body);
 
       request.post(
-        { 
+        {
           url: `https://api.graph.cool/simple/v1/${req.params.projectid}`,
-          method: 'post', 
+          method: 'post',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
             query: `
@@ -40,7 +40,7 @@ app.post('/:projectid', function (req, res) {
               }
             `
           })
-        }, 
+        },
         function(err,resp,body) {
           res.status(resp.statusCode).send(JSON.parse(body).data.updateFile);
         });
